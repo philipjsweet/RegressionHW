@@ -1,0 +1,146 @@
+---
+title: "Hw1"
+author: "Philip Sweet"
+date: "9/21/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# **1**
+Derive the least square estimators for the coefficients of a simple linear
+regression
+
+![Drawing.](/Users/philipsweet/Google Drive/2019-2020/Regression/HW1_1b.JPG)
+
+# **2**
+derive the Expectation and Variance of b1
+
+![Drawing.](/Users/philipsweet/Google Drive/2019-2020/Regression/HW1_2.JPG)
+
+# **3** 
+Consider the normal error regression model...
+![Drawing.](/Users/philipsweet/Google Drive/2019-2020/Regression/HW1_3.JPG)
+
+# **4** 
+ 
+## A 
+In this situation, the B0 would be relatively meaningless because B0 represents how far away a person who was zero year old would be able to read the a highway sign. No one who is zero years old is driving, however, if they were, this model predicts that they would be able to read it from 576 feet away.
+
+## B 
+In this situation, the B1 represents the negative change in distance (in feet) per year of age from which a driver can read a highway sign. B1’s value of 3 means that for each unit increase in age, the distance a driver can read a highway sign from decreases 
+ 
+## C
+![Drawing.](/Users/philipsweet/Google Drive/2019-2020/Regression/HW1_4.JPG)
+
+## D
+Residual = 44
+
+## E 
+
+D was an under-estimate 
+
+# **5**
+
+Stop has data on the speed (X, in mph) and stopping distance (Y, in ft) of 50 cars.
+```{r}
+read.csv("Stop.csv", header = TRUE) -> data
+
+```
+
+
+## A. 
+In this scatter plot, you can see that there is a positive linear relationship between current speed and breaking distance. 
+
+```{r}
+
+plot(data$speed, 
+     data$dist, 
+     main="Distance Requried to Break",
+    xlab="Speed (mph)",
+    ylab="Stopping Distance (ft)")
+```
+
+## B. 
+Here we will calculate the sum of squares
+
+```{r}
+n <-length(data) 
+X <-data$speed
+Y <-data$dist
+
+## find the means of both vars
+mean_x <-mean(X)
+mean_y <-mean(Y)
+
+## find the variance of each var
+var_x <-var(X)
+var_y <-var(Y)
+
+cov_xy <-cov(X,Y) 
+
+# finbd the sum of squares
+SS_xx <-(n-1)*var_x 
+SS_xy <-(n-1)*cov_xy 
+SS_yy <-(n-1)*var_y  
+
+## solve for estimaters 
+b1 <-SS_xy/SS_xx 
+b0 <-mean_y -b1*mean_x 
+yhat <-b0 + b1*X 
+e <-Y-yhat  
+SSE <-sum(e^2) 
+MSE <-SSE/(n-2) 
+s <-sqrt(MSE)  
+
+```
+The slope (b1) = `r b1` and the intercept (b0) = `r b0`
+
+Thus the est. regression equation is y = `r b1`x `r b0` 
+
+
+## C. 
+
+```{r}
+plot(X,Y,
+    xlim=c(0,25), 
+    main="Distance Requried to Break",
+    xlab="Speed (mph)",
+    ylab="Stopping Distance (ft)") 
+abline(a=b0,b=b1)  
+```
+
+When we lay the regression line overe the data, we can see that line seems to estiamte the stopping distance well at ll speeds provided in the data.
+
+## D
+
+When using the linear model function in R (lm) we can see that ...
+```{r}
+
+lm_a <- lm(Y ~ X)
+
+summary(lm_a)
+
+```
+... which (in the Coefficients column) generates the same estimates for B1 and B0 is what we had manually calculated above.
+
+## E 
+
+In this  context the slope (b1) represents an increased spotting distance of 3.9 feet for every extra mile per hout in speed. The intercept (b0) in this case is of no meaning, as a car that was not moving (speed = 0) would require no distance to stop, but it does suggest that the model may be less informative at lower speeds.
+
+## F 
+
+```{r}
+conf <- confint(lm_a, 'X', level=0.95)
+```
+The 95% confidence interval for the slope is ( `r conf` ), suggesting that there is a postive linear relationship since 0 is not within the interval.
+
+## G
+To a conduct a hypothesis test for a significant linear relationship between starting speed and stopping distance, we can use...
+
+Ho: b1 = 0
+
+Ha: b1 ≠ 0
+
+This test produces a p-value of 1.49e-12 that  well below the 0.05 cut off. Thus we can reject the null hypthesis (Ha) that b1 = 0 and state that there is a linear relationship between speed and stopping distance. 
+
