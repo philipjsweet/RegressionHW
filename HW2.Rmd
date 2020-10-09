@@ -1,0 +1,98 @@
+---
+title: "Hw2"
+author: "Philip Sweet"
+date: "10/06/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# **1**
+Given {b1} = 0.5, the power of the test with 48 degrees of freedom, for a true slope of 1.7, and a null of 0 would be 0.84 then there would be a 84% change of rejecting the null given that the true β1 was 1.7. 
+
+![Drawing.](/Users/pjs2567/Desktop/HW2-20201009T150925Z-001/HW2/HW2_1.JPG)
+
+# **2**
+
+## A
+
+Found by hand the 90% CI for a stoping distance given a starting speed of 15mph is...
+
+![Drawing.](/Users/pjs2567/Desktop/HW2-20201009T150925Z-001/HW2/HW2_2.JPG)
+
+## B
+
+```{r}
+
+read.csv("Stop.csv", header = TRUE) -> data
+
+n <-length(data) 
+X <-data$speed
+Y <-data$dist
+
+reg.stop <-lm(Y ~ X)
+
+new.dat <-data.frame(X=15)
+predict(reg.stop, newdata=new.dat, interval="confidence", level=0.90)
+ci <- predict(reg.stop, newdata=new.dat, interval="confidence", level=0.90) 
+```
+## C
+
+We can be 90% confident that the mean stopping distance, in ft, at 15mph is somewhere between (`r ci[2]`), (`r ci[3]`)
+
+# **3** 
+
+## A
+90% prediction interval for the stopping distance of a new driver whose speed is 15 mph.
+
+![Drawing.](/Users/pjs2567/Desktop/HW2-20201009T150925Z-001/HW2/HW2_3.JPG)
+
+## B
+
+```{r}
+predict(reg.stop, newdata=new.dat, interval="predict", level=0.90)
+ci <- predict(reg.stop, newdata=new.dat, interval="predict", level=0.90)
+```
+## C
+
+We can be 90% confident in predicting that a new stopping test conducted at 15mph would produce a stopping distance, in ft, somewhere between (`r ci[2]`), (`r ci[3]`)
+
+# **4** 
+
+## A
+
+A 90% prediction interval for the mean stopping distance of three new drivers each of whose speed is 15 mph.
+
+![Drawing.](/Users/pjs2567/Desktop/HW2-20201009T150925Z-001/HW2/HW2_4.JPG)
+
+## B
+
+```{r include=FALSE}
+library(ggplot2)
+library(ALSM)
+```
+```{r}
+ci.reg(reg.stop, new.dat, type = 'nm', alpha=0.10,m=3) -> threeRep
+
+threeRep[3:4]
+
+```
+
+## C
+
+The interval for the total stopping distance for all three tests would be between `r 3*threeRep[3]` and `r 3*threeRep[4]`
+
+# **5**
+
+A 95% confidence band for the simple linear regression line predicting stopping distance using speed.
+
+```{r}
+
+ggplot(data, aes(x=speed, y=dist)) + 
+  geom_point(color='#2980B9', size = 4) + 
+  geom_smooth(method=lm, color='#2C3E50') +
+  xlab("Spead (mph)") +
+  ylab("Stopping Dist. (ft)") +
+  theme_minimal()
+
+```
